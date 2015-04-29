@@ -8,7 +8,7 @@ do {
     $handle = fopen("php://stdin", "r");
     $line = fgets($handle);
     $line=trim($line);
-    if ("exit\n" == $line) {
+    if ("exit" == $line) {
         echo 'bue!' . "\n";
         die();
     } else {
