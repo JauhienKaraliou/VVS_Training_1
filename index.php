@@ -1,17 +1,20 @@
+#!/usr/bin/php5
 <?php
 if (isset($argv[1])) {
-    echo 'hi ' . "\033[0;36m" . $argv[1] . "\033[0;37m!\n";
+    $userName= $argv[1];
 } else {
-    echo 'hi,'."\033[0;35m Anonymous! \n\033[0;37m" . "\n";
+    $userName = 'Anonymouse';
 }
+echo "\033[0;36m" .$userName. "\033[0;37m!".' Buy an elephant!'."\n";
+$handle = fopen("php://stdin", "r");
 do {
-    $handle = fopen("php://stdin", "r");
     $line = fgets($handle);
     $line=trim($line);
-    if ("exit" == $line) {
+    if ("exit" == strtolower($line)) {
         echo 'bue!' . "\n";
-        die();
+        exit();
     } else {
-        echo ' everyone can say ' ."\033[0;36m\"".$line."\"\n\033[0;37m But what about to buy an elephant?\n";
+        echo $userName.', everyone can say ' ."\033[0;35m\"".$line."\"\033[0;37m. But what about to buy an elephant?\n";
     }
 } while (1);
+$handle = fclose("php://stdin");
