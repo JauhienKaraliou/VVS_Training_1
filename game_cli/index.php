@@ -7,6 +7,7 @@ ncurses_init();
 ncurses_start_color();
 ncurses_init_pair(1, NCURSES_COLOR_BLUE, NCURSES_COLOR_BLACK);
 ncurses_init_pair(2, NCURSES_COLOR_WHITE, NCURSES_COLOR_BLACK);
+ncurses_curs_set(0);
 $fullscreen = ncurses_newwin(0, 0, 0, 0);
 ncurses_clear();
 ncurses_refresh($fullscreen);
@@ -19,19 +20,25 @@ ncurses_getmaxyx($field, $fieldHeight, $fieldWidth);
 $fieldDots = str_repeat('.', $fieldWidth * $fieldHeight);
 ncurses_mvwaddstr($field, 0, 0, $fieldDots);
 ncurses_wrefresh($field);
+/**
+ * recount $fullscreen coordinates to $field coordinates
+ */
+$maxX = $fieldWidth + 1;
+$minX = 2;
+$maxY = $fieldHeight + 1;
+$minY = 2;
 $hero = new Person();
-$hero->setCurrentX(rand(0, $fieldWidth));
-$hero->setCurrentY(rand(0, $fieldHeight));
+$hero->setCurrentX(rand($minX, $maxX));
+$hero->setCurrentY(rand($minY, $maxY));
 $hero->setPreviousState();
 $hero->setSymbol('@');
+$step = -1;
 while (true) {
-    ncurses_mvwaddstr($frame, 0, 0, $hero->getCurrentY().'-'.$hero->getCurrentX().'--'.$hero->getPreviousY().'-'.$hero->getPreviousX());
+    $step++;
+    ncurses_mvwaddstr($frame, 0, 0, 'Y:'.$hero->getCurrentY().' X:'.$hero->getCurrentX()." Steps:".$step.' ');
     ncurses_wrefresh($frame);
-    ncurses_move($hero->getCurrentY(), $hero->getCurrentX());
-//ncurses_delch();
     ncurses_color_set(1);
-    ncurses_addch(ord($hero->getSymbol()));
-
+    ncurses_mvaddch($hero->getCurrentY(), $hero->getCurrentX(), ord($hero->getSymbol()));
     $pressed = ncurses_getch();
     if ($pressed == 27) {
         break;
@@ -50,19 +57,17 @@ while (true) {
                 $hero->moveRight();
                 break;
         }
-        ncurses_move($hero->getPreviousY(), $hero->getPreviousX());
-        ncurses_color_set(2);
-        ncurses_addch(ord('.'));
-        /*
-        if ($month >= 13) {
-            $month = 1;
-            $year++;
-        } elseif ($month <= 0) {
-            $month = 12;
-            $year--;
+        if ($hero->getCurrentX() > $maxX) {
+            $hero->setCurrentX($minX);
+        } elseif ($hero->getCurrentX() < $minX) {
+            $hero->setCurrentX($maxX);
+        } elseif ($hero->getCurrentY() > $maxY) {
+            $hero->setCurrentY($minY);
+        } elseif ($hero->getCurrentY() < $minY) {
+            $hero->setCurrentY($maxY);
         }
-        */
+        ncurses_color_set(2);
+        ncurses_mvaddch($hero->getPreviousY(), $hero->getPreviousX(), ord('.'));
     }
-
 }
 ncurses_end();
